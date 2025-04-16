@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tailpost-config
+data:
+  config.yaml: |
+    # Tailpost Agent Configuration for Kubernetes
+    
+    # Log source configuration
+    log_source_type: container
+    namespace: default
+    pod_name: my-app-pod
+    container_name: my-app-container
+    
+    # Server configuration
+    server_url: http://mock-server:8081/logs
+    
+    # Batch settings
+    batch_size: 10
+    flush_interval: 5s
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailpost-agent
+  labels:
+    app: tailpost-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailpost-agent
+  template:
+    metadata:
+      labels:
+        app: tailpost-agent
+    spec:
+      serviceAccountName: tailpost-sa
+      containers:
+      - name: tailpost-agent
+        image: ${REGISTRY_URL}/tailpost-agent:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - "--config"
+        - "/app/config/config.yaml"
+        - "--metrics-addr"
+        - ":8080"
+        ports:
+        - containerPort: 8080
+          name: metrics
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config-volume
+        configMap:
+          name: tailpost-config
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tailpost-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tailpost-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tailpost-role-binding
+subjects:
+- kind: ServiceAccount
+  name: tailpost-sa
+roleRef:
+  kind: Role
+  name: tailpost-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tailpost-metrics
+spec:
+  selector:
+    app: tailpost-agent
+  ports:
+  - port: 8080
+    targetPort: metrics
+  type: ClusterIP 

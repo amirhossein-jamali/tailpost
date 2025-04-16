@@ -1,0 +1,23 @@
+# Tailpost Agent Configuration for Docker
+
+# Log source configuration
+log_source_type: file
+log_path: /app/logs/sample.log
+
+# Server configuration
+server_url: http://mock-server:8081/logs
+
+# Batch settings
+batch_size: 10
+flush_interval: 5s
+
+# Security configuration
+security:
+  # Encryption configuration
+  encryption:
+    enabled: false
+    # Options: aes, chacha20poly1305
+    type: aes
+    # For Docker, we'll use an environment variable for the key
+    key_env: TAILPOST_ENCRYPTION_KEY
+    key_id: key-2023 

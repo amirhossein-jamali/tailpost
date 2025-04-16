@@ -1,0 +1,40 @@
+TailPost Proprietary License
+
+Copyright (c) 2025 Amirhossein Jamali
+All rights reserved.
+
+This license governs the use of the software known as "TailPost" (the "Software").
+
+Permission is hereby granted to use, copy, and distribute the Software solely for 
+evaluation and non-commercial purposes, provided that the following conditions are met:
+
+1. The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+2. The Software may not be used in production environments without express written
+   permission from Amirhossein Jamali.
+
+3. Any modifications to the Software must be clearly marked as such and must include
+   the following attribution statement in a prominent location in the source code and
+   documentation: "Based on TailPost by Amirhossein Jamali (https://github.com/amirhossein-jamali/tailpost)".
+
+4. Redistribution of the Software, modified or unmodified, for commercial purposes
+   is expressly prohibited without prior written permission from Amirhossein Jamali.
+
+5. Prior to using the Software in any commercial application, including internal use
+   within an organization, you must obtain a commercial license from Amirhossein Jamali.
+
+Commercial licensing options are available upon request. For commercial licensing 
+information, please contact the copyright holder at:
+Email: jamaali.amirhossein@gmail.com
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 

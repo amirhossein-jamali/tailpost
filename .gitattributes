@@ -1,0 +1,44 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Go source files always have LF line endings
+*.go text eol=lf
+*.mod text eol=lf
+*.sum text eol=lf
+
+# Shell scripts should have LF endings
+*.sh text eol=lf
+
+# Windows PowerShell scripts should have CRLF
+*.ps1 text eol=crlf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+LICENSE text eol=lf
+CONTRIBUTING.md text eol=lf
+
+# YAML/JSON configuration
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+docker-compose*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+
+# Exclude files from exporting
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
+
+# Go-specific attributes
+go.mod linguist-generated=false
+go.sum linguist-generated=false 

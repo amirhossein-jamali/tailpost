@@ -1,0 +1,24 @@
+# Example configuration for collecting logs from a Kubernetes container
+# This configuration can be used when Tailpost is running as a sidecar container
+# or as an agent with access to the Kubernetes API.
+
+# Type of log source (file, container, pod)
+log_source_type: container
+
+# Kubernetes namespace where the pod is running
+namespace: default
+
+# Name of the pod to collect logs from
+pod_name: nginx-deployment-66b6c48dd5-abcde
+
+# Name of the container in the pod to collect logs from
+container_name: nginx
+
+# URL to send logs to
+server_url: http://log-receiver:8080/logs
+
+# Number of log lines to batch before sending
+batch_size: 20
+
+# Maximum time to hold a batch before sending
+flush_interval: 5s 

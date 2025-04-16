@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tailpost-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tailpost-operator
+  namespace: tailpost-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tailpost-operator-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - pods
+  - services
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - tailpost.elastic.co
+  resources:
+  - tailpostagents
+  - tailpostagents/status
+  - tailpostagents/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tailpost-operator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tailpost-operator-role
+subjects:
+- kind: ServiceAccount
+  name: tailpost-operator
+  namespace: tailpost-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tailpost-operator-metrics
+  namespace: tailpost-system
+  labels:
+    app: tailpost-operator
+spec:
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: tailpost-operator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailpost-operator
+  namespace: tailpost-system
+  labels:
+    app: tailpost-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailpost-operator
+  template:
+    metadata:
+      labels:
+        app: tailpost-operator
+    spec:
+      serviceAccountName: tailpost-operator
+      containers:
+      - name: operator
+        image: tailpost-operator:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - "--metrics-bind-address=:8080"
+        - "--health-probe-bind-address=:8081"
+        - "--leader-elect=false"
+        - "--default-image=tailpost:latest"
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 8081
+          name: healthz
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi 

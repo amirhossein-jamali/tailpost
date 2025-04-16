@@ -1,0 +1,90 @@
+# TailPost agent secure configuration example
+# This configuration includes security settings for TLS, authentication, and encryption
+
+# Log source configuration
+log_source_type: file
+log_path: /var/log/application.log
+
+# Backend server configuration 
+server_url: https://logs.example.com/api/logs
+batch_size: 100
+flush_interval: 5s
+
+# Telemetry configuration for agent self-monitoring
+telemetry:
+  enabled: true
+  service_name: tailpost-agent
+  service_version: 0.1.0
+  exporter_type: http
+  exporter_endpoint: https://otel-collector.example.com:4318
+  sampling_rate: 0.1
+  attributes:
+    environment: production
+    service.instance.id: ${HOSTNAME}
+    deployment.environment: production
+
+# Security configuration
+security:
+  # TLS configuration
+  tls:
+    enabled: true
+    cert_file: /etc/tailpost/certs/client.crt
+    key_file: /etc/tailpost/certs/client.key
+    ca_file: /etc/tailpost/certs/ca.crt
+    insecure_skip_verify: false
+    server_name: logs.example.com
+    min_version: tls12
+    prefer_server_cipher_suites: true
+  
+  # Authentication configuration
+  auth:
+    # Options: none, basic, token, oauth2, header
+    type: basic
+    username: tailpost
+    password: ${TAILPOST_PASSWORD}
+    
+    # Token auth example (uncomment to use)
+    # type: token
+    # token_file: /etc/tailpost/auth/token.txt
+    
+    # OAuth2 example (uncomment to use)
+    # type: oauth2
+    # client_id: tailpost-agent
+    # client_secret: ${OAUTH_SECRET}
+    # token_url: https://auth.example.com/oauth/token
+    # scopes:
+    #   - logs:write
+    
+    # Custom header example (uncomment to use)
+    # type: header
+    # headers:
+    #   X-API-Key: ${API_KEY}
+    #   X-Tenant-ID: tenant123
+  
+  # Encryption configuration
+  encryption:
+    enabled: true
+    # Options: aes, chacha20poly1305
+    type: aes
+    key_file: /etc/tailpost/keys/encryption.key
+    # Alternative: use environment variable for key
+    # key_env: TAILPOST_ENCRYPTION_KEY
+    key_id: key-2023
+    rotation_days: 90
+
+# Windows Event Log specific settings (used when log_source_type is windows_event)
+# windows_event_log_name: Application
+# windows_event_log_level: Information
+
+# macOS log specific settings (used when log_source_type is macos_asl)
+# macos_log_query: "process == myapp"
+
+# Kubernetes specific settings (used when log_source_type is container or pod)
+# namespace: default
+# pod_name: my-app-pod
+# container_name: my-app
+# pod_selector:
+#   app: my-app
+#   tier: frontend
+# namespace_selector:
+#   environment: production 

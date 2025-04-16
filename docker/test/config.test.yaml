@@ -1,0 +1,27 @@
+# TailPost Agent Test Configuration
+
+# Basic configuration
+log_path: /var/log/tailpost/sidecar.log
+server_url: http://mock-server:8081/logs
+batch_size: 5
+flush_interval: 1s
+
+# Log source configuration
+log_source_type: file
+
+# Security settings (disabled for testing)
+security:
+  tls:
+    enabled: false
+  auth:
+    type: none
+
+# Telemetry settings for testing
+telemetry:
+  enabled: true
+  service_name: tailpost-test
+  service_version: 1.0.0
+  exporter_type: console
+  sampling_rate: 1.0
+  attributes:
+    environment: test 

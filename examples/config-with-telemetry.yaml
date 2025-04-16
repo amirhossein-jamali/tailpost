@@ -1,0 +1,75 @@
+# Tailpost configuration example with telemetry enabled
+# This configuration collects logs from a file and sends them to a server
+# while also exporting telemetry data to an OpenTelemetry collector
+
+# Basic log collection configuration
+log_source_type: file
+log_path: /var/log/system.log
+server_url: http://log-receiver:8080/logs
+batch_size: 100
+flush_interval: 10s
+
+# OpenTelemetry telemetry configuration
+telemetry:
+  # Enable/disable telemetry collection
+  enabled: true
+  
+  # Service information
+  service_name: "tailpost-agent"
+  service_version: "1.0.0"
+  
+  # Exporter configuration - can be "http" or "grpc"
+  exporter_type: "http"
+  exporter_endpoint: "http://otel-collector:4318"
+  
+  # Sampling configuration (1.0 = 100% sampling)
+  sampling_rate: 1.0
+  
+  # Context propagation for distributed tracing
+  context_propagation: true
+  
+  # Custom attributes to add to all telemetry data
+  attributes:
+    environment: "production"
+    region: "us-west-1"
+    deployment_id: "deployment-123"
+    host: "${HOSTNAME}"
+
+# Log processing configuration
+processing:
+  # Add additional fields to each log entry
+  add_fields:
+    environment: "production"
+    service: "web-app"
+    
+  # Parse logs using a specific format
+  parse:
+    format: "json"  # Supports: json, regex, keyvalue
+    
+  # Filter logs based on conditions
+  filter:
+    include:
+      - field: "level"
+        operator: "in"
+        values: ["error", "warning", "critical"]
+
+# Advanced configuration
+advanced:
+  # Backoff strategy for connection failures
+  retry:
+    initial_delay: 1s
+    max_delay: 30s
+    max_retries: 5
+    
+  # Buffer configuration for storing logs during outages
+  buffer:
+    max_size: "100MB"
+    type: "memory"  # Supports: memory, disk
+    
+  # TLS configuration for secure connections
+  tls:
+    enabled: true
+    verify_cert: true
+    ca_cert: "/path/to/ca.crt"
+    client_cert: "/path/to/client.crt"
+    client_key: "/path/to/client.key" 

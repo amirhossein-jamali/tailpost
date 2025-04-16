@@ -1,0 +1,76 @@
+# Tailpost Agent Configuration
+
+# Log file settings
+log:
+  path: "/app/sample.log"
+  format: "text"  # Can be "text" or "json"
+  follow: true
+
+# Server connection settings
+server:
+  url: "https://tailpost.example.com/api/v1/logs"
+  token: "sample-token-1234567890"
+  batch_size: 100
+  flush_interval: "5s"
+
+# Processing settings
+processing:
+  patterns:
+    - name: "error_pattern"
+      regex: "ERROR.*"
+      priority: "high"
+    - name: "warning_pattern"
+      regex: "WARN.*"
+      priority: "medium"
+    - name: "info_pattern"
+      regex: "INFO.*"
+      priority: "low"
+  enrichment:
+    add_hostname: true
+    add_timestamp: true
+    add_environment: "development"
+
+# Health server settings
+health:
+  port: 8080
+  path: "/health"
+  ready_path: "/ready"
+  metrics_path: "/metrics"
+
+# General settings
+general:
+  server_url: "http://mock-server:8081/logs"
+  batch_size: 100
+  flush_interval: "5s"
+  retry_interval: "10s"
+  max_retries: 3
+
+# HTTP server settings
+http:
+  listen_address: ":8080"
+
+# Log sources
+sources:
+  - name: "sample-file"
+    type: "file"
+    path: "/app/sample.log"
+    include_pattern: ".*"
+    exclude_pattern: ""
+    fields:
+      app: "sample-application"
+      environment: "development"
+
+  # Example of container log source (commented out)
+  # - name: "container-logs"
+  #   type: "container"
+  #   container_id: "container_id_here"
+  #   include_pattern: ".*"
+  #   exclude_pattern: "DEBUG"
+  #   fields:
+  #     app: "container-app"
+  #     environment: "production"
+
+# Logging configuration
+logging:
+  level: "debug"
+  format: "json" 

@@ -1,0 +1,30 @@
+FROM golang:1.23.0-alpine AS builder
+
+WORKDIR /app
+
+# Copy go module files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY test/mock/mock_server.go .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o mock-server mock_server.go
+
+# Create lightweight production image
+FROM alpine:3.16
+
+WORKDIR /app
+
+# Install wget for health checks
+RUN apk --no-cache add wget
+
+# Copy binary from builder
+COPY --from=builder /app/mock-server .
+
+# Expose port
+EXPOSE 8081
+
+# Set the entrypoint
+ENTRYPOINT ["/app/mock-server"] 

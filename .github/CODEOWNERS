@@ -1,0 +1,22 @@
+# TailPost CODEOWNERS File
+# Each line is a file pattern followed by one or more owners.
+
+# These owners will be the default owners for everything in the repo.
+*       @amirhossein-jamali
+
+# Core application code
+/cmd/   @amirhossein-jamali
+/pkg/   @amirhossein-jamali
+
+# Configuration and deployment
+/configs/       @amirhossein-jamali
+/deploy/        @amirhossein-jamali
+/docker/        @amirhossein-jamali
+/install/       @amirhossein-jamali
+
+# Documentation
+/docs/          @amirhossein-jamali
+*.md            @amirhossein-jamali
+
+# CI/CD and GitHub workflows
+/.github/       @amirhossein-jamali 

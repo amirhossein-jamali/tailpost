@@ -1,0 +1,87 @@
+# Binaries
+tailpost
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+agent.exe
+operator.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# Dependency directories
+vendor/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build/release artifacts
+release/
+dist/
+
+# Configuration files that might contain sensitive data
+config.local.yaml
+*.local.yaml
+*.env
+.env
+.env.local
+
+# Debug files
+__debug_bin
+
+# Generated documentation
+docs/api/
+
+# Docker artifacts
+.docker/
+
+# Kubernetes generated manifests
+deploy/kubernetes/generated/
+
+# Version files
+version.go
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+*.password
+
+# Custom ignores for this project
+/tailpost-*
+/.tailpost-cache/
+
+# Additional ignores
+.venv/
+node_modules/
+__pycache__/
+.coverage
+coverage.xml
+*.sublime-workspace
+.terraform/
+*.tfstate
+*.tfstate.backup
+.vagrant/ 

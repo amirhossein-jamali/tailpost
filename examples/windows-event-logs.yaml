@@ -1,0 +1,22 @@
+# Example configuration for Windows Event Logs
+# This configuration collects logs from the Windows event log system
+
+# Type of log source
+log_source_type: windows_event
+
+# Name of the Windows event log to collect logs from
+# Options include: Application, System, Security, and others
+windows_event_log_name: Application
+
+# Minimum level of events to collect
+# Options: Information, Warning, Error, Critical, Verbose
+windows_event_log_level: Warning
+
+# URL to send logs to
+server_url: http://log-receiver:8080/logs
+
+# Number of log lines to batch before sending
+batch_size: 20
+
+# Maximum time to hold a batch before sending
+flush_interval: 5s

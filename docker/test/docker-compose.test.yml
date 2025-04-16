@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./logs:/var/log/tailpost
+    environment:
+      - LOG_LEVEL=debug
+      - LOG_FORMAT=console
+      - CONFIG_PATH=/app/config.yaml
+    networks:
+      - tailpost-test
+
+  mock-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mock
+    ports:
+      - "8081:8081"
+    networks:
+      - tailpost-test
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  sidecar-container:
+    image: alpine:latest
+    command: >
+      sh -c "while true; do
+             echo \"$$(date): Sidecar log entry\" >> /var/log/tailpost/sidecar.log;
+             sleep 1;
+             done"
+    volumes:
+      - ./logs:/var/log/tailpost
+    networks:
+      - tailpost-test
+
+networks:
+  tailpost-test:
+    driver: bridge 

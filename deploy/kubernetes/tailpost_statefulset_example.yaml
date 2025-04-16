@@ -1,0 +1,56 @@
+apiVersion: tailpost.elastic.co/v1alpha1
+kind: TailpostAgent
+metadata:
+  name: tailpost-statefulset
+  namespace: monitoring
+spec:
+  # Run multiple instances for high availability
+  replicas: 3
+  
+  # Custom TailPost image
+  image: tailpost:1.2.0
+  
+  # Image pull policy
+  imagePullPolicy: Always
+  
+  # Service account with appropriate permissions
+  serviceAccount: tailpost-collector
+  
+  # Log sources to collect - multiple sources can be specified
+  logSources:
+    # Collect from important system logs
+    - type: file
+      path: /var/log/syslog
+    
+    # Collect from database containers across all namespaces
+    - type: container
+      podSelector:
+        matchLabels:
+          component: database
+      namespaceSelector:
+        matchLabels:
+          environment: production
+    
+    # Collect from all API servers in the cluster
+    - type: pod
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: api-server
+  
+  # Central log aggregation endpoint
+  serverURL: http://elasticsearch-ingest:9200/logs
+  
+  # Larger batch size for efficiency
+  batchSize: 50
+  
+  # More frequent flush for reduced latency
+  flushInterval: 3s
+  
+  # Resource requests and limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi 
