@@ -30,7 +30,8 @@ COPY --from=builder /app/tailpost /usr/local/bin/tailpost
 RUN chmod +x /usr/local/bin/tailpost
 
 # Default config file
-COPY config.yaml /etc/tailpost/config.yaml
+ARG CONFIG_FILE=./docker/config.docker.yaml
+COPY ${CONFIG_FILE} /etc/tailpost/config.yaml
 
 # Set environment variables
 ENV TAILPOST_CONFIG_PATH=/etc/tailpost/config.yaml
