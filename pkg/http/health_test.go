@@ -314,7 +314,9 @@ func TestStartWithUsedPort(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	// Cleanup
-	server.Stop()
+	if err := server.Stop(); err != nil {
+		t.Fatalf("Failed to stop server: %v", err)
+	}
 }
 
 // Test stopping the server before starting it
@@ -366,7 +368,11 @@ func TestInvalidPath(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to start server: %v", err)
 	}
-	defer server.Stop()
+	defer func() {
+		if err := server.Stop(); err != nil {
+			t.Fatalf("Failed to stop server: %v", err)
+		}
+	}()
 
 	// Find allocated port
 	addr := server.server.Addr
@@ -550,7 +556,9 @@ func TestSetTLSConfig(t *testing.T) {
 	assert.Equal(t, uint16(tls.VersionTLS12), server.server.TLSConfig.MinVersion)
 
 	// Cleanup
-	server.Stop()
+	if err := server.Stop(); err != nil {
+		t.Fatalf("Failed to stop server: %v", err)
+	}
 }
 
 // Test no effect of SetTLSConfig with nil configuration
@@ -574,7 +582,9 @@ func TestSetTLSConfigWithNil(t *testing.T) {
 	assert.NotNil(t, server.server.TLSConfig)
 
 	// Cleanup
-	server.Stop()
+	if err := server.Stop(); err != nil {
+		t.Fatalf("Failed to stop server: %v", err)
+	}
 }
 
 // Test SetTLSConfig before Start

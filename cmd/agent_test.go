@@ -136,7 +136,11 @@ flush_interval: 1s
 	if err != nil {
 		t.Fatalf("Failed to append to log file: %v", err)
 	}
-	logFile.Close()
+
+	// Flush after each write to ensure it's written to disk
+	if err := logFile.Sync(); err != nil {
+		t.Fatalf("Failed to sync log file: %v", err)
+	}
 
 	// Read the log file to verify it was written to
 	logData, err := os.ReadFile(logFilePath)
@@ -894,13 +898,17 @@ func TestSecureHealthServer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create secure health server: %v", err)
 	}
+	defer func() {
+		if err := secureServer.Stop(); err != nil {
+			t.Fatalf("Failed to stop secure health server: %v", err)
+		}
+	}()
 
 	// Start the server
 	err = secureServer.Start()
 	if err != nil {
 		t.Fatalf("Failed to start secure health server: %v", err)
 	}
-	defer secureServer.Stop()
 
 	// Mark as ready
 	secureServer.SetReady(true)
@@ -945,12 +953,6 @@ func TestSecureHealthServer(t *testing.T) {
 
 	if status.Status != "ready" {
 		t.Errorf("Expected status 'ready', got '%s'", status.Status)
-	}
-
-	// Stop the server
-	err = secureServer.Stop()
-	if err != nil {
-		t.Fatalf("Failed to stop secure health server: %v", err)
 	}
 
 	// Wait for server to shut down
@@ -1369,7 +1371,9 @@ telemetry:
 	defer func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
-		metricsServer.Shutdown(ctx)
+		if err := metricsServer.Shutdown(ctx); err != nil {
+			t.Logf("Error shutting down metrics server: %v", err)
+		}
 	}()
 
 	// Load the configuration
@@ -1496,7 +1500,9 @@ telemetry:
 			t.Fatalf("Failed to append to log file: %v", err)
 		}
 		// Flush after each write to ensure it's written to disk
-		logFile.Sync()
+		if err := logFile.Sync(); err != nil {
+			t.Fatalf("Failed to sync log file: %v", err)
+		}
 	}
 	logFile.Close()
 
@@ -1525,7 +1531,9 @@ telemetry:
 		logReader.Stop()
 
 		t.Log("Stopping health server")
-		healthServer.Stop()
+		if err := healthServer.Stop(); err != nil {
+			t.Logf("Error stopping health server: %v", err)
+		}
 
 		// Set a short timeout for waiting
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 1*time.Second)
@@ -1813,8 +1821,7 @@ func TestSignalHandling(t *testing.T) {
 
 		// 2. Stop the components in reverse order
 		t.Log("Stopping health server")
-		err := healthServer.Stop()
-		if err != nil {
+		if err := healthServer.Stop(); err != nil {
 			t.Logf("Error stopping health server: %v", err)
 		} else {
 			healthServerStopped = true
