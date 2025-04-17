@@ -127,24 +127,43 @@ spec:
   config:
     log_sources:
       - type: container
-        namespace: default
+namespace: default
         pod_label_selector: app=nginx
 ```
 
 ## Telemetry Integration
 
-TailPost provides comprehensive observability through:
+TailPost provides observability through a built-in telemetry system:
 
-- **Distributed Tracing**: Trace log flow from collection to delivery
+- **Distributed Tracing**: Trace log flow from collection to delivery using OpenTelemetry
 - **Performance Metrics**: Monitor batch sizes, processing times, and delivery latency
 - **Error Tracking**: Capture errors during log collection and delivery
 
-Metrics and traces can be exported to:
+### Supported Telemetry Exports:
+
+- **OpenTelemetry**: Native support with both HTTP and gRPC protocols
+- **Prometheus**: Built-in metrics exporters for Prometheus scraping
+
+Through OpenTelemetry's ecosystem, you can further connect to:
 - Jaeger
 - Zipkin
-- Prometheus
 - OpenTelemetry Collector
-- Cloud-based observability platforms
+- Various cloud-based observability platforms
+
+### Sample Telemetry Configuration:
+
+```yaml
+telemetry:
+  enabled: true
+  service_name: "tailpost-agent"
+  service_version: "1.0.0"
+  exporter_type: "http"     # "http", "grpc", or "none"
+  exporter_endpoint: "http://otel-collector:4318"
+  sampling_rate: 1.0
+  attributes:
+    environment: "production"
+    region: "us-west"
+```
 
 ## Development
 
