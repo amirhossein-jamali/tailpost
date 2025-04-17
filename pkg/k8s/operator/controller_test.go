@@ -96,7 +96,9 @@ func newMockReconciler(r *TailpostAgentReconciler) *MockTailpostReconciler {
 func setupReconcilerAndInstance() (*TailpostAgentReconciler, *v1alpha1.TailpostAgent, *runtime.Scheme) {
 	// Setup schemes
 	s := runtime.NewScheme()
-	scheme.AddToScheme(s)
+	if err := scheme.AddToScheme(s); err != nil {
+		panic(fmt.Errorf("failed to register core scheme: %w", err))
+	}
 	if err := v1alpha1.Register(s); err != nil {
 		// In test code, if we can't register the scheme, we should panic
 		panic(fmt.Errorf("failed to register v1alpha1 scheme: %w", err))
@@ -144,7 +146,9 @@ func setupReconcilerAndInstance() (*TailpostAgentReconciler, *v1alpha1.TailpostA
 func TestTailpostAgentReconciler_setDefaults(t *testing.T) {
 	// Setup schemes
 	s := runtime.NewScheme()
-	scheme.AddToScheme(s)
+	if err := scheme.AddToScheme(s); err != nil {
+		t.Fatalf("Failed to register core scheme: %v", err)
+	}
 	if err := v1alpha1.Register(s); err != nil {
 		t.Fatalf("Failed to register v1alpha1 scheme: %v", err)
 	}

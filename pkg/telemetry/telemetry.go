@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -115,7 +116,8 @@ func Setup(ctx context.Context, cfg Config) (func(), error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := traceProvider.Shutdown(ctx); err != nil {
-			// Log error but don't fail
+			// Log error using standard library since we're in cleanup
+			log.Printf("Error shutting down trace provider: %v", err)
 		}
 	}, nil
 }

@@ -48,11 +48,6 @@ func CreateTLSConfig(tlsConfig config.TLSConfig) (*tls.Config, error) {
 		cfg.MaxVersion = version
 	}
 
-	// Set server cipher suites preference
-	// Note: PreferServerCipherSuites is deprecated since Go 1.18 and is ignored.
-	// It is kept here for backward compatibility with older Go versions.
-	cfg.PreferServerCipherSuites = tlsConfig.PreferServerCipherSuites
-
 	// Load CA cert if specified
 	if tlsConfig.CAFile != "" {
 		caCert, err := os.ReadFile(tlsConfig.CAFile)
@@ -106,9 +101,6 @@ func CreateTLSConfigFromEnv() (*tls.Config, error) {
 		MinVersion:         os.Getenv("TAILPOST_TLS_MIN_VERSION"),
 		MaxVersion:         os.Getenv("TAILPOST_TLS_MAX_VERSION"),
 		InsecureSkipVerify: os.Getenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY") == "true",
-		// Note: PreferServerCipherSuites is deprecated since Go 1.18 and is ignored.
-		// It is kept here for backward compatibility with older Go versions.
-		PreferServerCipherSuites: os.Getenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES") != "false",
 	}
 
 	return CreateTLSConfig(tlsConfig)

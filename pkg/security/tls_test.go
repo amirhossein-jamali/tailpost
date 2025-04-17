@@ -85,21 +85,8 @@ func TestCreateTLSConfig(t *testing.T) {
 		t.Errorf("Expected error with invalid max TLS version, got nil")
 	}
 
-	// Test PreferServerCipherSuites
-	cfg = config.TLSConfig{
-		Enabled:                  true,
-		PreferServerCipherSuites: true,
-	}
-	tlsConfig, err = CreateTLSConfig(cfg)
-	if err != nil {
-		t.Errorf("Unexpected error with PreferServerCipherSuites: %v", err)
-	}
-	if tlsConfig == nil {
-		t.Fatalf("Expected non-nil TLS config, got nil")
-	}
-	if !tlsConfig.PreferServerCipherSuites {
-		t.Errorf("Expected PreferServerCipherSuites to be true")
-	}
+	// Note: PreferServerCipherSuites is deprecated since Go 1.18 and is ignored.
+	// No longer testing this deprecated field.
 }
 
 func TestCreateTLSConfigWithCertificates(t *testing.T) {
@@ -166,6 +153,38 @@ func TestCreateTLSConfigWithCertificates(t *testing.T) {
 	// without creating valid certificate files, which requires external resources
 }
 
+func TestCreateTLSConfigWithDefaults(t *testing.T) {
+	// Test with enabled but minimal configuration
+	cfg := config.TLSConfig{
+		Enabled: true,
+	}
+	tlsConfig, err := CreateTLSConfig(cfg)
+	if err != nil {
+		t.Errorf("Unexpected error with minimal config: %v", err)
+	}
+	if tlsConfig == nil {
+		t.Fatalf("Expected non-nil TLS config, got nil")
+	}
+
+	// Ensure defaults are set correctly
+	assert.Equal(t, uint16(0), tlsConfig.MinVersion, "MinVersion should not be set")
+	assert.Equal(t, uint16(0), tlsConfig.MaxVersion, "MaxVersion should not be set")
+
+	// Test with disabled configuration
+	cfg = config.TLSConfig{
+		Enabled: false,
+	}
+	tlsConfig, err = CreateTLSConfig(cfg)
+	if err != nil {
+		t.Errorf("Unexpected error with disabled config: %v", err)
+	}
+	if tlsConfig != nil {
+		t.Errorf("Expected nil TLS config when disabled, got non-nil")
+	}
+
+	// The PreferServerCipherSuites setting is deprecated in Go 1.18+ and has been removed
+}
+
 func TestCreateTLSConfigFromEnv(t *testing.T) {
 	// Create test directory for certificates
 	testDir, err := os.MkdirTemp("", "tls-test-env")
@@ -191,7 +210,6 @@ func TestCreateTLSConfigFromEnv(t *testing.T) {
 	oldTLSMaxVersion := os.Getenv("TAILPOST_TLS_MAX_VERSION")
 	oldTLSServerName := os.Getenv("TAILPOST_TLS_SERVER_NAME")
 	oldTLSInsecureSkipVerify := os.Getenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY")
-	oldTLSPreferServerCipherSuites := os.Getenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES")
 
 	defer func() {
 		os.Setenv("TAILPOST_TLS_ENABLED", oldTLSEnabled)
@@ -202,7 +220,6 @@ func TestCreateTLSConfigFromEnv(t *testing.T) {
 		os.Setenv("TAILPOST_TLS_MAX_VERSION", oldTLSMaxVersion)
 		os.Setenv("TAILPOST_TLS_SERVER_NAME", oldTLSServerName)
 		os.Setenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY", oldTLSInsecureSkipVerify)
-		os.Setenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES", oldTLSPreferServerCipherSuites)
 	}()
 
 	// Clear all environment variables
@@ -214,7 +231,6 @@ func TestCreateTLSConfigFromEnv(t *testing.T) {
 	os.Unsetenv("TAILPOST_TLS_MAX_VERSION")
 	os.Unsetenv("TAILPOST_TLS_SERVER_NAME")
 	os.Unsetenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY")
-	os.Unsetenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES")
 
 	// Test with TLS disabled by default
 	tlsConfig, err := CreateTLSConfigFromEnv()
@@ -256,7 +272,6 @@ func TestCreateTLSConfigFromEnv(t *testing.T) {
 	os.Setenv("TAILPOST_TLS_MIN_VERSION", "tls12")
 	os.Setenv("TAILPOST_TLS_MAX_VERSION", "tls13")
 	os.Setenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY", "true")
-	os.Setenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES", "true")
 
 	tlsConfig, err = CreateTLSConfigFromEnv()
 	if err != nil {
@@ -268,17 +283,8 @@ func TestCreateTLSConfigFromEnv(t *testing.T) {
 	assert.Equal(t, uint16(tls.VersionTLS12), tlsConfig.MinVersion, "Min version should match tls12")
 	assert.Equal(t, uint16(tls.VersionTLS13), tlsConfig.MaxVersion, "Max version should match tls13")
 	assert.True(t, tlsConfig.InsecureSkipVerify, "InsecureSkipVerify should be true")
-	assert.True(t, tlsConfig.PreferServerCipherSuites, "PreferServerCipherSuites should be true")
 
-	// Test disabling PreferServerCipherSuites explicitly
-	os.Setenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES", "false")
-	tlsConfig, err = CreateTLSConfigFromEnv()
-	if err != nil {
-		t.Errorf("Unexpected error with PREFER_SERVER_CIPHER_SUITES=false: %v", err)
-	}
-
-	assert.NotNil(t, tlsConfig, "TLS config should not be nil")
-	assert.False(t, tlsConfig.PreferServerCipherSuites, "PreferServerCipherSuites should be false")
+	// The PreferServerCipherSuites setting is deprecated in Go 1.18+ and has been removed
 }
 
 func TestTLSVersionMapping(t *testing.T) {
