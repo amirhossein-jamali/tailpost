@@ -87,4 +87,4 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |
-          CONFIG_FILE=./docker/config.docker.yaml 
+          CONFIG_FILE=./docker/config.docker.encrypt.yaml 
