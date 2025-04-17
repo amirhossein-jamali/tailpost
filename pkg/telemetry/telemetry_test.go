@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -48,7 +48,7 @@ func TestTracer(t *testing.T) {
 	defer otel.SetTracerProvider(originalProvider)
 
 	// Set a custom tracer provider for testing
-	provider := trace.NewNoopTracerProvider()
+	provider := noop.NewTracerProvider()
 	otel.SetTracerProvider(provider)
 
 	tracer := Tracer("test-tracer")

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 )
@@ -294,7 +295,7 @@ func TestGetDefaultLogPath(t *testing.T) {
 	// Check OS-specific paths
 	switch runtime.GOOS {
 	case "windows":
-		if !filepath.HasPrefix(filepath.ToSlash(path), filepath.ToSlash(os.Getenv("SYSTEMROOT"))) {
+		if !isPathPrefixOf(filepath.ToSlash(os.Getenv("SYSTEMROOT")), filepath.ToSlash(path)) {
 			t.Errorf("Expected Windows path to start with %%SYSTEMROOT%%, got: %s", path)
 		}
 	case "darwin":
@@ -1062,4 +1063,17 @@ security:
 		t.Errorf("Expected security.encryption.type to be default '%s', got '%s'",
 			defaultConfig.Encryption.Type, cfg.Security.Encryption.Type)
 	}
+}
+
+// Function to use instead of directly using filepath.HasPrefix
+func isPathPrefixOf(prefix, path string) bool {
+	// Standardize paths by converting to slash
+	prefixSlash := filepath.ToSlash(prefix)
+	pathSlash := filepath.ToSlash(path)
+
+	// Check if the second path starts with the prefix of the first path
+	// and also check if there is a path separator after the prefix
+	return strings.HasPrefix(pathSlash, prefixSlash) &&
+		(len(pathSlash) == len(prefixSlash) ||
+			pathSlash[len(prefixSlash)] == '/')
 }

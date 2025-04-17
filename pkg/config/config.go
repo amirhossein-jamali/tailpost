@@ -29,15 +29,18 @@ const (
 
 // TLSConfig represents TLS configuration for secure communications
 type TLSConfig struct {
-	Enabled                  bool   `yaml:"enabled"`
-	CertFile                 string `yaml:"cert_file"`
-	KeyFile                  string `yaml:"key_file"`
-	CAFile                   string `yaml:"ca_file"`
-	InsecureSkipVerify       bool   `yaml:"insecure_skip_verify"`
-	ServerName               string `yaml:"server_name"`
+	Enabled            bool   `yaml:"enabled"`
+	CertFile           string `yaml:"cert_file"`
+	KeyFile            string `yaml:"key_file"`
+	CAFile             string `yaml:"ca_file"`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify"`
+	ServerName         string `yaml:"server_name"`
+	// PreferServerCipherSuites is deprecated since Go 1.18 and is ignored in newer versions,
+	// but is kept for backwards compatibility with older Go versions.
+	PreferServerCipherSuites bool   `yaml:"prefer_server_cipher_suites"`
 	MinVersion               string `yaml:"min_version"`
 	MaxVersion               string `yaml:"max_version"`
-	PreferServerCipherSuites bool   `yaml:"prefer_server_cipher_suites"`
+	CipherSuites             string `yaml:"cipher_suites"`
 }
 
 // AuthConfig represents authentication configuration

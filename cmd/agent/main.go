@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,7 +32,12 @@ func main() {
 
 	// Configure logging
 	logger := setupLogging(*logLevel, *logFormat)
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			// Can't use logger itself to log this error
+			fmt.Fprintf(os.Stderr, "Failed to sync logger: %v\n", err)
+		}
+	}()
 
 	// Create context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())
@@ -298,7 +304,9 @@ func handleSignals(ctx context.Context, cancel context.CancelFunc, logReader rea
 	logSender.Stop()
 
 	logger.Info("Stopping health server")
-	healthServer.Stop()
+	if err := healthServer.Stop(); err != nil {
+		logger.Error("Error stopping health server", zap.Error(err))
+	}
 
 	// Wait for processing to complete
 	<-processingDone

@@ -180,11 +180,6 @@ func main() {
 	}
 
 	// Create and setup the reconciler
-	defaultImage := os.Getenv("TAILPOST_DEFAULT_IMAGE")
-	if defaultImage == "" {
-		defaultImage = "tailpost:latest"
-	}
-
 	reconciler, err := operator.NewTailpostAgentReconciler(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create reconciler")

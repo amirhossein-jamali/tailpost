@@ -168,7 +168,9 @@ func (s *HealthServer) healthHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(status)
+	if err := json.NewEncoder(w).Encode(status); err != nil {
+		log.Printf("Error encoding health status: %v", err)
+	}
 }
 
 // readyHandler handles readiness checks
@@ -182,7 +184,9 @@ func (s *HealthServer) readyHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(status)
+		if err := json.NewEncoder(w).Encode(status); err != nil {
+			log.Printf("Error encoding ready status: %v", err)
+		}
 	} else {
 		status := HealthStatus{
 			Status:    "not ready",
@@ -192,7 +196,9 @@ func (s *HealthServer) readyHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusServiceUnavailable)
-		json.NewEncoder(w).Encode(status)
+		if err := json.NewEncoder(w).Encode(status); err != nil {
+			log.Printf("Error encoding not ready status: %v", err)
+		}
 	}
 }
 
@@ -201,7 +207,18 @@ func (s *HealthServer) metricsHandler(w http.ResponseWriter, r *http.Request) {
 	// Will be replaced with real metrics in a future implementation
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("# HELP tailpost_up Whether the Tailpost agent is running\n"))
-	w.Write([]byte("# TYPE tailpost_up gauge\n"))
-	w.Write([]byte("tailpost_up 1\n"))
+
+	if _, err := w.Write([]byte("# HELP tailpost_up Whether the Tailpost agent is running\n")); err != nil {
+		log.Printf("Error writing metrics: %v", err)
+		return
+	}
+
+	if _, err := w.Write([]byte("# TYPE tailpost_up gauge\n")); err != nil {
+		log.Printf("Error writing metrics: %v", err)
+		return
+	}
+
+	if _, err := w.Write([]byte("tailpost_up 1\n")); err != nil {
+		log.Printf("Error writing metrics: %v", err)
+	}
 }

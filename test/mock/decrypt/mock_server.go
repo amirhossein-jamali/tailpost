@@ -127,7 +127,10 @@ func main() {
 	// Add health endpoint for health checks
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
+		_, err := w.Write([]byte(`{"status":"ok"}`))
+		if err != nil {
+			log.Printf("Error writing health response: %v", err)
+		}
 	})
 
 	addr := ":8081"

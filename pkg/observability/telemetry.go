@@ -15,6 +15,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 // TelemetryConfig configures the OpenTelemetry integration
@@ -100,7 +101,7 @@ func NewTelemetryManager(config TelemetryConfig) *TelemetryManager {
 func (tm *TelemetryManager) Start(ctx context.Context) error {
 	if !tm.config.Enabled {
 		// Use a no-op tracer if telemetry is disabled
-		tm.tracer = trace.NewNoopTracerProvider().Tracer("tailpost")
+		tm.tracer = noop.NewTracerProvider().Tracer("tailpost")
 		return nil
 	}
 
@@ -152,7 +153,7 @@ func (tm *TelemetryManager) Start(ctx context.Context) error {
 		exporter, exportErr = otlptrace.New(ctx, otlptracehttp.NewClient(opts...))
 	case "none":
 		// No exporter, use no-op
-		tm.tracer = trace.NewNoopTracerProvider().Tracer("tailpost")
+		tm.tracer = noop.NewTracerProvider().Tracer("tailpost")
 		return nil
 	default:
 		return fmt.Errorf("unknown exporter type: %s", tm.config.ExporterType)
