@@ -421,7 +421,9 @@ func main() {
 
 	// Stop components in reverse order
 	logger.Info("Stopping health server")
-	healthServer.Stop()
+	if err := healthServer.Stop(); err != nil {
+		logger.Error("Error stopping health server", zap.Error(err))
+	}
 
 	logger.Info("Stopping sender")
 	httpSender.Stop()

@@ -2,6 +2,7 @@ package operator
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -96,7 +97,10 @@ func setupReconcilerAndInstance() (*TailpostAgentReconciler, *v1alpha1.TailpostA
 	// Setup schemes
 	s := runtime.NewScheme()
 	scheme.AddToScheme(s)
-	v1alpha1.Register(s)
+	if err := v1alpha1.Register(s); err != nil {
+		// In test code, if we can't register the scheme, we should panic
+		panic(fmt.Errorf("failed to register v1alpha1 scheme: %w", err))
+	}
 
 	// Create a TailpostAgent instance with defaults already set
 	instance := &v1alpha1.TailpostAgent{
@@ -141,7 +145,9 @@ func TestTailpostAgentReconciler_setDefaults(t *testing.T) {
 	// Setup schemes
 	s := runtime.NewScheme()
 	scheme.AddToScheme(s)
-	v1alpha1.Register(s)
+	if err := v1alpha1.Register(s); err != nil {
+		t.Fatalf("Failed to register v1alpha1 scheme: %v", err)
+	}
 
 	// Create a minimal TailpostAgent instance
 	instance := &v1alpha1.TailpostAgent{
