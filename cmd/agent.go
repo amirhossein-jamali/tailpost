@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -128,7 +129,11 @@ func main() {
 		zapLevel,
 	)
 	logger := zap.New(core)
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to sync logger: %v\n", err)
+		}
+	}()
 
 	// Create context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())

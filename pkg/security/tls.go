@@ -49,6 +49,8 @@ func CreateTLSConfig(tlsConfig config.TLSConfig) (*tls.Config, error) {
 	}
 
 	// Set server cipher suites preference
+	// Note: PreferServerCipherSuites is deprecated since Go 1.18 and is ignored.
+	// It is kept here for backward compatibility with older Go versions.
 	cfg.PreferServerCipherSuites = tlsConfig.PreferServerCipherSuites
 
 	// Load CA cert if specified
@@ -96,14 +98,16 @@ func CreateTLSConfigFromEnv() (*tls.Config, error) {
 	}
 
 	tlsConfig := config.TLSConfig{
-		Enabled:                  tlsEnabled,
-		CertFile:                 os.Getenv("TAILPOST_TLS_CERT_FILE"),
-		KeyFile:                  os.Getenv("TAILPOST_TLS_KEY_FILE"),
-		CAFile:                   os.Getenv("TAILPOST_TLS_CA_FILE"),
-		ServerName:               os.Getenv("TAILPOST_TLS_SERVER_NAME"),
-		MinVersion:               os.Getenv("TAILPOST_TLS_MIN_VERSION"),
-		MaxVersion:               os.Getenv("TAILPOST_TLS_MAX_VERSION"),
-		InsecureSkipVerify:       os.Getenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY") == "true",
+		Enabled:            tlsEnabled,
+		CertFile:           os.Getenv("TAILPOST_TLS_CERT_FILE"),
+		KeyFile:            os.Getenv("TAILPOST_TLS_KEY_FILE"),
+		CAFile:             os.Getenv("TAILPOST_TLS_CA_FILE"),
+		ServerName:         os.Getenv("TAILPOST_TLS_SERVER_NAME"),
+		MinVersion:         os.Getenv("TAILPOST_TLS_MIN_VERSION"),
+		MaxVersion:         os.Getenv("TAILPOST_TLS_MAX_VERSION"),
+		InsecureSkipVerify: os.Getenv("TAILPOST_TLS_INSECURE_SKIP_VERIFY") == "true",
+		// Note: PreferServerCipherSuites is deprecated since Go 1.18 and is ignored.
+		// It is kept here for backward compatibility with older Go versions.
 		PreferServerCipherSuites: os.Getenv("TAILPOST_TLS_PREFER_SERVER_CIPHER_SUITES") != "false",
 	}
 
